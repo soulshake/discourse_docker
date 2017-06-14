@@ -302,7 +302,7 @@ set_template_info() {
         p e
        end
     end
-    puts env.map{|k,v| "-e\n#{k}=#{v}" }.join("\n")
+    puts env.map{|k,v| "#{k}=#{v}" }.join("\n")
 RUBY
 
     raw=`exec echo "$input" | $docker_path run $user_args --rm -i -a stdin -a stdout $image ruby -e "$env_ruby"`
@@ -557,12 +557,12 @@ run_bootstrap() {
   if [[ ! "false" =  $update_pups ]]; then
     run_command="$run_command git pull &&"
   fi
-  run_command="$run_command /pups/bin/pups --stdin"
+  run_command="$run_command $envs /pups/bin/pups --stdin"
 
   echo $run_command
 
   unset ERR
-  (exec echo "$input" | $docker_path run $user_args $links "${env[@]}" -e DOCKER_HOST_IP="$docker_ip" --cidfile $cidbootstrap -i -a stdin -a stdout -a stderr $volumes $image \
+  (exec echo "$input" | $docker_path run $user_args $links -e DOCKER_HOST_IP="$docker_ip" --cidfile $cidbootstrap -i -a stdin -a stdout -a stderr $volumes $image \
     /bin/bash -c "$run_command") || ERR=$?
 
   unset FAILED
