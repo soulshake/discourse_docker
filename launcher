@@ -486,9 +486,12 @@ run_start() {
    set_run_image
    set_boot_command
 
+   env_file="/tmp/env-blah"
+   > "$env_file"
    # get hostname and settings from container configuration
    for envar in "${env[@]}"
    do
+     echo "$envar" >> "$env_file"
      if [[ $envar == DOCKER_USE_HOSTNAME* ]] || [[ $envar == DISCOURSE_HOSTNAME* ]]
      then
        # use as environment variable
@@ -517,7 +520,7 @@ run_start() {
      fi
 
      set -x
-     $docker_path run $links $attach_on_run $restart_policy "${env[@]}" "${labels[@]}" -h "$hostname" \
+     $docker_path run --env-file "$env_file" $links $attach_on_run $restart_policy "${labels[@]}" -h "$hostname" \
         -e DOCKER_HOST_IP="$docker_ip" --name $config -t $ports $volumes $mac_address $docker_args $user_args \
         $run_image $boot_command
 
