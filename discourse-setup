@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# If the secrets file exists, source it for easier defaults
+[ -e /tmp/.env ] && source /tmp/.env
+
 ##
 ## Make sure only root can run our script
 ##
@@ -266,6 +269,11 @@ read_config() {
   config_line=`egrep "^  #?$1:" $config_file`
   read_config_result=`echo $config_line | awk '{print $2}'`
   read_config_result=`echo $read_config_result | sed "s/^\([\"']\)\(.*\)\1\$/\2/g"`
+
+  # If the environment variable is present, use that
+  ev="$1"
+  [ ! -z "${!ev}" ] && read_config_result=$(echo "${!ev}") || echo "$ev not in env: ${!ev}"
+
 }
 
 
